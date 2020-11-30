@@ -62,45 +62,61 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.symmetric(
-          vertical: 80.0,
-        ),
-        itemCount: 10,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 40.0,
-                vertical: 20.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'My New Tasks!',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 40.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Text(
-                    '1 of 10',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  )
-                ],
-              ),
+      body: FutureBuilder(
+        future: _taskList,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: CircularProgressIndicator(),
             );
           }
-          return _buildTasks(index);
+
+          final int completedTaskCount = snapshot.data
+              .where((Task task) => task.status == 1)
+              .toList()
+              .length;
+
+          return ListView.builder(
+            padding: EdgeInsets.symmetric(
+              vertical: 80.0,
+            ),
+            itemCount: 1 + snapshot.data.length,
+            itemBuilder: (BuildContext context, int index) {
+              if (index == 0) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 40.0,
+                    vertical: 20.0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'My New Tasks!',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 40.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Text(
+                        '$completedTaskCount of ${snapshot.data.length}',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              }
+              return _buildTasks(snapshot.data[index - 1]);
+            },
+          );
         },
       ),
     );
