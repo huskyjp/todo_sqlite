@@ -14,9 +14,8 @@ class Task {
   // Create Map
   Map<String, dynamic> toMap() {
     final map = Map<String, dynamic>();
-    if(id != null) {
-    map['id'] = id;
-
+    if (id != null) {
+      map['id'] = id;
     }
     map['title'] = title;
     map['date'] = date.toIso8601String();
@@ -26,6 +25,7 @@ class Task {
     return map;
   }
 
+  // create only this map when Task class called
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task.withId(
       id: map['id'],
@@ -33,6 +33,6 @@ class Task {
       date: DateTime.parse(map['date']),
       priority: map['priority'],
       status: map['status'],
-    )
+    );
   }
 }
