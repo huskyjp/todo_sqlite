@@ -7,7 +7,7 @@ class AddTasksScreen extends StatefulWidget {
 }
 
 class _AddTasksScreenState extends State<AddTasksScreen> {
-  // validate user input
+  // validate user input 
   final _formKey = GlobalKey<FormState>();
   String _title = '';
   String _priority;
@@ -21,6 +21,12 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
   void initState() {
     super.initState();
     _dateController.text = _dateFormatter.format(_date);
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
   }
 
   _handleDatePicker() async {
