@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// format calendar date instead single string
 import 'package:intl/intl.dart';
 
 class AddTasksScreen extends StatefulWidget {
@@ -7,8 +8,9 @@ class AddTasksScreen extends StatefulWidget {
 }
 
 class _AddTasksScreenState extends State<AddTasksScreen> {
-  // validate user input 
+  // validate user input
   final _formKey = GlobalKey<FormState>();
+
   String _title = '';
   String _priority;
   DateTime _date = DateTime.now();
@@ -41,6 +43,7 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
       setState(() {
         _date = date;
       });
+      // controll text field number depends on calendar tap
       _dateController.text = _dateFormatter.format(date);
     }
   }
@@ -50,9 +53,9 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
       _formKey.currentState.save();
       print('$_title, $_date, $_priority');
 
-      // Insert the task to the user database
+      // TODO: Insert the task to the user database
 
-      // Update the task
+      // TODO: Update the list screen UI
 
       Navigator.pop(context);
     }
@@ -100,6 +103,7 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          // text field for user routine
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 20.0,
@@ -109,19 +113,20 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
                                 fontSize: 18.0,
                               ),
                               decoration: InputDecoration(
-                                labelText: 'Title',
+                                labelText: 'Your Routine',
                                 labelStyle: TextStyle(fontSize: 18.0),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
                               validator: (input) => input.trim().isEmpty
-                                  ? 'Please enter a task title'
+                                  ? 'Please enter your routine here!'
                                   : null,
                               onSaved: (input) => _title = input,
                               initialValue: _title,
                             ),
                           ),
+                          // Calendar field
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 20.0,
@@ -142,6 +147,7 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
                               ),
                             ),
                           ),
+                          // Priority Field
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 20.0,
@@ -151,18 +157,21 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
                               icon: Icon(Icons.arrow_drop_down_circle),
                               iconSize: 22.0,
                               iconEnabledColor: Theme.of(context).primaryColor,
-                              items: _priorities.map((String priority) {
-                                return DropdownMenuItem(
-                                  value: priority,
-                                  child: Text(
-                                    priority,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 18.0,
+                              items: _priorities.map(
+                                (String priority) {
+                                  return DropdownMenuItem(
+                                    value: priority,
+                                    child: Text(
+                                      priority,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18.0,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }).toList(),
+                                  );
+                                  // TODO: Add Timer field and pass that value to Timer Screen
+                                },
+                              ).toList(),
                               style: TextStyle(
                                 fontSize: 18.0,
                               ),
