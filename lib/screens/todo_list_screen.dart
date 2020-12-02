@@ -52,9 +52,11 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      /// button in the right bottom
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.add_circle_outline),
+        // push to scrren where task is added
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -92,7 +94,7 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'My New Tasks!',
+                        'My Task Timers!',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 40.0,
