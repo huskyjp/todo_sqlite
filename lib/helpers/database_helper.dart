@@ -23,6 +23,7 @@ class DatabaseHelper {
     if (_db == null) {
       _db = await _initDb();
     }
+    // if exists
     return _db;
   }
 
@@ -36,9 +37,10 @@ class DatabaseHelper {
     return todoListDb;
   }
 
+  // create actual database
   void _createDb(Database db, int version) async {
     await db.execute(
-      'CREATE TABLE $tasksTable($colId INTEGER PRIMARY KEY AUTO, $colTitle TEXT, $colDate TEXT, $colPriority TEXT, $colStatus INTEGER)',
+      'CREATE TABLE $tasksTable($colId INTEGER PRIMARY KEY, $colTitle TEXT, $colDate TEXT, $colPriority TEXT, $colStatus INTEGER)',
     );
   }
 
@@ -60,6 +62,7 @@ class DatabaseHelper {
     taskMapList.forEach((taskMap) {
       taskList.add(Task.fromMap(taskMap));
     });
+    taskList.sort((taskA, taskB) => taskA.date.compareTo(taskB.date));
     return taskList;
   }
 

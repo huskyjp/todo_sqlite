@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_sqlite/helpers/database_helper.dart';
 import 'package:todo_sqlite/models/task_model.dart';
 import 'package:todo_sqlite/screens/add_tasks_screen.dart';
@@ -10,6 +11,8 @@ class ToDoListScreen extends StatefulWidget {
 
 class _ToDoListScreenState extends State<ToDoListScreen> {
   Future<List<Task>> _taskList;
+  final DateFormat _dateFormatter = DateFormat('MMM dd, yyyy');
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
   @override
   void initState() {
@@ -17,13 +20,27 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
     _updateTaskList();
   }
 
-  _updateTaskList() {
+  _updateTaskList() async {
     setState(() {
       _taskList = DatabaseHelper.instance.getTaskList();
     });
+    List list = await _taskList;
+    _listKey.currentState.insertItem(list.length - 1);
   }
 
-  _buildTasks<Widget>(int index) {
+  _deleteTaskList(String title) async {
+    setState(() {
+      _taskList = DatabaseHelper.instance.getTaskList();
+    });
+    List list = await _taskList;
+    print(title);
+    _listKey.currentState.removeItem(list.indexOf(title, 1),
+        (context, animation) {
+      return SizedBox.shrink();
+    });
+  }
+
+  _buildTasks<Widget>(Task task) {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 25.0,
@@ -31,16 +48,44 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
       child: Column(
         children: [
           ListTile(
-            title: Text('Task Title'),
-            subtitle: Text("NOW"),
+            title: Text(
+              task.title,
+              style: TextStyle(
+                fontSize: 18.0,
+                decoration: task.status == 0
+                    ? TextDecoration.none
+                    : TextDecoration.lineThrough,
+              ),
+            ),
+            subtitle: Text(
+              '${_dateFormatter.format(task.date)} ・ ${task.priority}',
+              style: TextStyle(
+                fontSize: 15.0,
+                decoration: task.status == 0
+                    ? TextDecoration.none
+                    : TextDecoration.lineThrough,
+              ),
+            ),
             trailing: Checkbox(
               onChanged: (value) {
                 setState(() {
-                  value = true;
+                  task.status = value ? 1 : 0;
+                  DatabaseHelper.instance.updateTask(task);
+                  _updateTaskList();
                 });
               },
               activeColor: Theme.of(context).primaryColor,
-              value: false,
+              value: task.status == 1 ? true : false,
+            ),
+            onLongPress: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AddTasksScreen(
+                  task: task,
+                  updateTaskList: _updateTaskList,
+                  deleteTaskList: _deleteTaskList,
+                ),
+              ),
             ),
           ),
           Divider(),
@@ -60,7 +105,9 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => AddTasksScreen(),
+            builder: (_) => AddTasksScreen(
+              updateTaskList: _updateTaskList,
+            ),
           ),
         ),
       ),
@@ -73,17 +120,20 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
             );
           }
 
+          // If snapshot has data (user added tasks)
           final int completedTaskCount = snapshot.data
               .where((Task task) => task.status == 1)
               .toList()
               .length;
 
-          return ListView.builder(
+          return AnimatedList(
             padding: EdgeInsets.symmetric(
               vertical: 80.0,
             ),
-            itemCount: 1 + snapshot.data.length,
-            itemBuilder: (BuildContext context, int index) {
+            key: _listKey,
+            initialItemCount: 1 + snapshot.data.length,
+            itemBuilder:
+                (BuildContext context, int index, Animation<double> animation) {
               if (index == 0) {
                 return Padding(
                   padding: EdgeInsets.symmetric(
@@ -94,7 +144,7 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'My Task Timers!',
+                        'Have A Nice Day!',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 40.0,
@@ -116,7 +166,14 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                   ),
                 );
               }
-              return _buildTasks(snapshot.data[index - 1]);
+
+              Tween<Offset> _offset =
+                  Tween(begin: Offset(1, 0), end: Offset(0, 0));
+
+              return SlideTransition(
+                child: _buildTasks(snapshot.data[index - 1]),
+                position: animation.drive(_offset),
+              );
             },
           );
         },
