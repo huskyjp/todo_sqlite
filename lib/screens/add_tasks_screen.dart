@@ -91,6 +91,7 @@ class _AddTasksScreenState extends State<AddTasksScreen> {
   _delete() {
     DatabaseHelper.instance.deleteTask(widget.task.id);
     // call back
+    print(widget.task.)
     widget.deleteTaskList(widget.task.title);
     Navigator.pop(context);
   }
